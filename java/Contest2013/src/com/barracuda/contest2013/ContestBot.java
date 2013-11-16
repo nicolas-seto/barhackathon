@@ -13,10 +13,12 @@ public class ContestBot {
 	private final String host;
 	private final int port;
 	private int game_id = -1;
+	private RemainingCardStats load;
 
 	public ContestBot(String host, int port) {
 		this.host = host;
 		this.port = port;
+		this.load = new RemainingCardStats();
 	}
 
 	private void run() {
@@ -50,23 +52,11 @@ public class ContestBot {
 			}
 		}
 	}
-
-	/** Return the category of which this card is in.  
-	 *  0 = low
-	 *  1 = medium
-	 *  2 = high
-	 */
-	public int returnCategory(int value) {
-	    if (value < 5) {
-	        return 0;
-	    } else if (5 <= value && value < 9) {
-	        return 1;
-	    } else {
-	        return 2;
-	    }
-	}
 	
 	public PlayerMessage handleMessage(Message message) {
+	    
+	    
+	    
 		if (message.type.equals("request")) {
 			MoveMessage m = (MoveMessage)message;
 			//System.out.println(m.toString());
@@ -75,19 +65,35 @@ public class ContestBot {
 				System.out.println("new game " + game_id);
 			}
 
+			if (m.state.hand_id % 10 == 1) {
+	            load.reshuffle();
+	        }
+			
 			int[] currentHand = m.state.hand;
             Arrays.sort(currentHand);
             
+            boolean accept = ChallengeHelper.isChallengeAccepted(currentHand, m.state.your_tricks, m.state.their_tricks, m.state.your_points, m.state.their_points, m.state.card);
+            
             /* It is our turn */
 			if (m.request.equals("request_card")) {
+			    
+			    /* If our hand has 5 cards, decrement cards from remaining */
+			    if (currentHand.length == 5) {
+			        for (int i = 0; i < 5; i++) {
+			            load.decrement(currentHand[i]);
+			        }
+			    }
+			    
 			    /* We are first to play */
 				if (m.state.card == 0) {
 				    /* No one has challenged yet and we can challenge */
 				    if (m.state.can_challenge) {
 				        /* If we have 3 tricks or more */
-    				    if (m.state.your_tricks >= 3) {
+    				    if (m.state.your_tricks >= 3 || accept) { 
     				        return new OfferChallengeMessage(m.request_id);
-    				    } else if (currentHand.length % 2 == 1) { /* Pick middle */
+    				    }
+    				    
+    				    if (currentHand.length % 2 == 1) { /* Pick middle */
     				        return new PlayCardMessage(m.request_id, currentHand[currentHand.length / 2]);
     				    } else if (currentHand.length % 2 == 0) { /* Card is even, then pick the lower half */
     				        return new PlayCardMessage(m.request_id, currentHand[(currentHand.length / 2) - 1]);
@@ -105,6 +111,7 @@ public class ContestBot {
 				    int minWinIndex = -1;
 
                     System.out.println("Their hand: " + m.state.card);
+                    load.decrement(m.state.card);
 
                     for(int i = 0; i < currentHand.length; i++) {
                         int difference = currentHand[i] - m.state.card;
@@ -124,7 +131,7 @@ public class ContestBot {
                                 /* If they have 2 tricks, we tie otherwise they would win */
                                 if (m.state.their_tricks == 2) {
                                     return new PlayCardMessage(m.request_id, currentHand[indexTie]);
-                                } else { //edit later
+                                } else { //edit later: maybe add more conditions
                                     return new PlayCardMessage(m.request_id, currentHand[0]);
                                 }
                             } else { /* We can't tie, so play the lowest card */
@@ -142,17 +149,24 @@ public class ContestBot {
                     }
 				}
 			} else if (m.request.equals("challenge_offered")) {
+			    
 			    if (m.state.their_tricks > m.state.your_tricks) { // they have more tricks than us
 			        if (m.state.their_tricks >= 3){ // if they have 3+ tricks already, it's automatic loss in point
 	                    return new RejectChallengeMessage(m.request_id);
 	                } else { // edit later: check our current hand
+	                    if(accept){
+	                        return new AcceptChallengeMessage(m.request_id);
+	                    }
 	                    return new RejectChallengeMessage(m.request_id);
 	                }
 			    } else if (m.state.their_tricks < m.state.your_tricks) { // we have more tricks than them
 			        if (m.state.your_tricks >= 3){ // if we have 3+ tricks already, this is an instant win
 	                    return new AcceptChallengeMessage(m.request_id);
 	                } else { // edit later: check our current hand
-	                    return new AcceptChallengeMessage(m.request_id);
+	                    if(accept){
+	                        return new AcceptChallengeMessage(m.request_id);
+	                    }
+	                    return new RejectChallengeMessage(m.request_id);
 	                }
 			    } else { // we are tied in tricks
                     return new RejectChallengeMessage(m.request_id);
@@ -161,7 +175,6 @@ public class ContestBot {
             }
 		} else if (message.type.equals("result")) {
 			ResultMessage r = (ResultMessage) message;
-			System.out.println(r.toString());
 		} else if (message.type.equals("error")) {
 			ErrorMessage e = (ErrorMessage)message;
 			System.err.println("Error: " + e.message);
