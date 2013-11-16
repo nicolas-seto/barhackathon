@@ -3,7 +3,7 @@ public class ChallengeHelper {
     private static int checkCard(int[] currentHand,int ourScore,int theirScore,int card)
     {
         int result = 0;//result =0 is bad, = 1 is good, =2 is best,=3 you have to accept;
-        int king=0,queen=0,jack=0;
+        int king=0,queen=0,jack=0, ten=0;
         int arrayLength = currentHand.length;
         for(int i = 0;i < arrayLength; i++) 
         {
@@ -17,6 +17,9 @@ public class ChallengeHelper {
                 break;
             case 11:
                 jack++;
+                break;
+            case 10:
+                ten++;
                 break;
             default:
                 break;
@@ -35,6 +38,9 @@ public class ChallengeHelper {
             case 11:
                 jack++;
                 break;
+            case 10:
+                ten++;
+                break;
             default:
                 break;
             } 
@@ -47,15 +53,21 @@ public class ChallengeHelper {
             /* 5 cards in play */
             if(theirScore ==0)
             {
-                /* If no tie or 1 tie */
-                if(arrayLength == 5 || arrayLength == 4)
+                /* If no tie */
+                if(arrayLength == 5)
                 {
+                    if((king+queen+jack+ten) >= 3)
+                    {
+                        result = 2;
+                    }
+                /* If 1 tie */
+                } else if (arrayLength == 4) {
                     if((king+queen+jack) >= 3)
                     {
                         result = 2;
                     }
                 /* If 2 ties */
-                } else if(arrayLength == 3)
+                }else if(arrayLength == 3)
                 {
                     if((king+queen+jack) >= 2)
                     {
@@ -278,7 +290,7 @@ public class ChallengeHelper {
             result = true;
         }else if(ourPoint == 9)
         {
-            if(handAssessment ==2){result = true;}
+            if(handAssessment >=2){result = true;}
         }else if (ourPoint == 8 )
         {
             if(theirPoint >2 && theirPoint <7)
@@ -287,7 +299,7 @@ public class ChallengeHelper {
             }
             else if(theirPoint >= 7)// && theirPoint !=9)
             {
-                if(handAssessment ==2){result = true;}
+                if(handAssessment >=2){result = true;}
             }
         }else if (ourPoint <= 7)
         {
@@ -299,7 +311,7 @@ public class ChallengeHelper {
                 if(handAssessment >=1 ){result = true;}
             }
         }
-        if(handAssessment ==3)
+        if(handAssessment == 3)
         {
             result = true;
         }
@@ -309,7 +321,8 @@ public class ChallengeHelper {
     public static boolean issueChallenge (int[] sort,int ourScore,int theirScore,int ourPoint, int theirPoint,int card)
     {
         boolean result = isChallengeAccepted(sort,ourScore,theirScore,ourPoint,theirPoint,0);
-        if(ourScore == theirScore && sort.length ==1 )
+        int size = sort.length;
+        if(ourScore == theirScore && size ==1 )
         {
             if(card == 13)
             {
@@ -325,8 +338,10 @@ public class ChallengeHelper {
         }
         
         /* 2nd turn of trick and we have two tricks and our largest card is greater than the given card  */
-        if(card != 0 && ourScore ==2 && sort[sort.length-1] - card >0)
+        if(card != 0 && ourScore ==2 && sort[size-1] - card >0)
         {
+            result = true;
+        } else if (size == 1 && ourScore == 2 && theirScore == 1) {
             result = true;
         }
                 
