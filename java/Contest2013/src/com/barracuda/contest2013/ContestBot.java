@@ -145,10 +145,10 @@ public class ContestBot {
                         }
                     }
                     
+                    int lowestWin = currentHand[minWinIndex];
                     /* If we reach here, that means that we have at least one card that can beat the opponent's card. */
                     /* We can lose, tie, and win */
                     if (indexTie != -1) {
-                        int lowestWin = currentHand[minWinIndex];
                         /* If the card is within a difference of 3, beat it */
                         if (lowestWin - m.state.card <= 3) {
                             return new PlayCardMessage(m.request_id, lowestWin);
