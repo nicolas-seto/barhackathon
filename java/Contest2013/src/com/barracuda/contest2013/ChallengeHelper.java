@@ -324,7 +324,8 @@ public class ChallengeHelper {
             result = true;
         }
         
-        if(ourScore ==2 && sort[sort.length-1] - card >0)
+        /* 2nd turn of trick and we have two tricks and our largest card is greater than the given card  */
+        if(card != 0 && ourScore ==2 && sort[sort.length-1] - card >0)
         {
             result = true;
         }
