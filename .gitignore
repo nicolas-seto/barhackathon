@@ -1,8 +1,0 @@
-#Eclipse IDE
-.project
-.settings/
-.classpath
-
-#Build
-target/
-/bin
