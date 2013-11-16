@@ -39,6 +39,36 @@ public class HandleRequestCard {
         
     }
 
+    public static boolean bestHand(){
+        //if hand has  more highs 
+    	if(high > (medium+low) && high == arraySize-1){
+            return true;
+    	}
+        else{
+            return false;
+        }
+    }
+    
+    public static boolean goodHand(){
+        //if hand has  more highs 
+    	if(high > (medium+low)){
+            return true;
+    	}
+        else{
+            return false;
+        }
+    }
+    
+    public static boolean mediumHand(){
+        //if hand has  more highs 
+    	if((high + medium) > low){
+            return true;
+    	}
+        else{
+            return false;
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
