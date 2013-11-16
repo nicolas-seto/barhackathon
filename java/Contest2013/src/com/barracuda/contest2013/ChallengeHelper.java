@@ -305,4 +305,30 @@ public class ChallengeHelper {
         }
         return result;
     }
+    
+    public static boolean issueChallenge (int[] sort,int ourScore,int theirScore,int ourPoint, int theirPoint,int card)
+    {
+        boolean result = isChallengeAccepted(sort,ourScore,theirScore,ourPoint,theirPoint,0);
+        if(ourScore == theirScore && sort.length ==1 )
+        {
+            if(card == 13)
+            {
+                result = false;
+            } else if (sort[0] == 13) {
+                result = true;
+            }
+        }       
+        
+        if(theirPoint == 9)
+        {
+            result = true;
+        }
+        
+        if(ourScore ==2 && sort[sort.length-1] - card >0)
+        {
+            result = true;
+        }
+                
+        return result;
+    }
 }
