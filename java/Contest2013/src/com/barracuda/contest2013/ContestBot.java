@@ -148,14 +148,17 @@ public class ContestBot {
                     int lowestWin = currentHand[minWinIndex];
                     /* If we reach here, that means that we have at least one card that can beat the opponent's card. */
                     /* We can lose, tie, and win */
-                        /* If the card is within a difference of 3, beat it */
-                        if (lowestWin - m.state.card <= 3) {
-                            return new PlayCardMessage(m.request_id, lowestWin);
-                        /* If our next highest winning card is much larger than opponent's card, drop lowest card */
-                        } else if (lowestWin - m.state.card >= 4) {
-                            return new PlayCardMessage(m.request_id, currentHand[0]);
-                        }
+                    if (m.state.their_tricks == 2) {
                         return new PlayCardMessage(m.request_id, lowestWin);
+                    }
+                    /* If the card is within a difference of 3, beat it */
+                    if (lowestWin - m.state.card <= 3) {
+                        return new PlayCardMessage(m.request_id, lowestWin);
+                    /* If our next highest winning card is much larger than opponent's card, drop lowest card */
+                    } else if (lowestWin - m.state.card >= 4) {
+                        return new PlayCardMessage(m.request_id, currentHand[0]);
+                    }
+                    return new PlayCardMessage(m.request_id, lowestWin);
 				}
 			} else if (m.request.equals("challenge_offered")) {
 			    
