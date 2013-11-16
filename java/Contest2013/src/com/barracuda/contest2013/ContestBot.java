@@ -75,24 +75,36 @@ public class ContestBot {
 				System.out.println("new game " + game_id);
 			}
 
+			int[] currentHand = m.state.hand;
+            Arrays.sort(currentHand);
+            
+            /* It is our turn */
 			if (m.request.equals("request_card")) {
-			    int[] currentHand = m.state.hand;
-                Arrays.sort(currentHand);
-                
-			    /* We are first to play and can play card or issue challenge*/
-				if (m.state.can_challenge) {
-				    if (m.state.your_tricks >= 3) {
-				        return new OfferChallengeMessage(m.request_id);
-				    } else {
-				        return new PlayCardMessage(m.request_id, currentHand[currentHand.length - 1]);
+			    /* We are first to play */
+				if (m.state.card == 0) {
+				    /* No one has challenged yet and we can challenge */
+				    if (m.state.can_challenge) {
+				        /* If we have 3 tricks or more */
+    				    if (m.state.your_tricks >= 3) {
+    				        return new OfferChallengeMessage(m.request_id);
+    				    } else if (currentHand.length % 2 == 1) { /* Pick middle */
+    				        return new PlayCardMessage(m.request_id, currentHand[currentHand.length / 2]);
+    				    } else if (currentHand.length % 2 == 0) {
+    				        return new PlayCardMessage(m.request_id, currentHand[(currentHand.length / 2) - 1]);
+    				    }
+				    } else { /* A challenge has been offered and we're playing */
+				        if (currentHand.length % 2 == 1) {
+                            return new PlayCardMessage(m.request_id, currentHand[currentHand.length / 2]);
+                        } else if (currentHand.length % 2 == 0) {
+                            return new PlayCardMessage(m.request_id, currentHand[(currentHand.length / 2) - 1]);
+                        }
 				    }
 				}
-				else { /* We are second to play and can only play card */
+				else { /* We are second to play */
 				    int indexTie = -1;
 				    int minWinIndex = -1;
 
                     System.out.println("Their hand: " + m.state.card);
-                    
 
                     for(int i = 0; i < currentHand.length; i++) {
                         int difference = currentHand[i] - m.state.card;
