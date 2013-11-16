@@ -89,7 +89,7 @@ public class ContestBot {
 				    /* No one has challenged yet and we can challenge */
 				    if (m.state.can_challenge) {
 				        /* If we have 3 tricks or more */
-    				    if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
+    				    if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
     				        return new OfferChallengeMessage(m.request_id);
     				    }
     				    if (currentHand.length % 2 == 1) { /* Pick middle */
@@ -113,7 +113,7 @@ public class ContestBot {
                     load.decrement(m.state.card);
 
                     if (m.state.can_challenge) {
-                        if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
+                        if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
                             return new OfferChallengeMessage(m.request_id);
                         }
                     }
@@ -148,7 +148,6 @@ public class ContestBot {
                     int lowestWin = currentHand[minWinIndex];
                     /* If we reach here, that means that we have at least one card that can beat the opponent's card. */
                     /* We can lose, tie, and win */
-                    if (indexTie != -1) {
                         /* If the card is within a difference of 3, beat it */
                         if (lowestWin - m.state.card <= 3) {
                             return new PlayCardMessage(m.request_id, lowestWin);
@@ -157,16 +156,6 @@ public class ContestBot {
                             return new PlayCardMessage(m.request_id, currentHand[0]);
                         }
                         return new PlayCardMessage(m.request_id, lowestWin);
-                    } else { /* We can lose or win a trick */
-                        /* If the tying card is 1 or 2, tie it. */
-                        if (currentHand[0] <= 2) {
-                            return new PlayCardMessage(m.request_id, currentHand[0]);
-                            /* If our next highest winning card is much larger than opponent's card and our lowest card  is much lower, drop lowest card */
-                        } else if ((m.state.card - currentHand[0] >= 3) && (currentHand[minWinIndex] - m.state.card >= 3)) {
-                            return new PlayCardMessage(m.request_id, currentHand[0]);
-                        }
-                        return new PlayCardMessage(m.request_id, currentHand[minWinIndex]);
-                    }
 				}
 			} else if (m.request.equals("challenge_offered")) {
 			    
