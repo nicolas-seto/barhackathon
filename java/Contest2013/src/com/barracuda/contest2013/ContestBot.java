@@ -51,6 +51,21 @@ public class ContestBot {
 		}
 	}
 
+	/** Return the category of which this card is in.  
+	 *  0 = low
+	 *  1 = medium
+	 *  2 = high
+	 */
+	public int returnCategory(int value) {
+	    if (value < 5) {
+	        return 0;
+	    } else if (5 <= value && value < 9) {
+	        return 1;
+	    } else {
+	        return 2;
+	    }
+	}
+	
 	public PlayerMessage handleMessage(Message message) {
 		if (message.type.equals("request")) {
 			MoveMessage m = (MoveMessage)message;
@@ -61,44 +76,67 @@ public class ContestBot {
 			}
 
 			if (m.request.equals("request_card")) {
+			    
+			    int[] currentHand = m.state.hand;
+                Arrays.sort(currentHand);
+                
 			    /* We are first to play and can play card or issue challenge*/
 				if (m.state.can_challenge) {
-				   
+				    return new PlayCardMessage(m.request_id, m.state.hand[currentHand.length -1]);
 				}
 				else { /* We are second to play and can only play card */
-				    int indextie = -1;
+				    int indexTie = -1;
 				    int minWinIndex = -1;
-				    int minLoseIndex = 0;
+				    int indexToUse = -1;
 
                     System.out.println("Their hand: " + m.state.card);
-                    int[] currentHand = m.state.hand;
-                    Arrays.sort(currentHand);
+                    
 
                     for(int i = 0; i < currentHand.length; i++) {
                         int difference = currentHand[i] - m.state.card;
                         
                         if (difference == 0) {
                             /* Stores index */
-                            indextie = i;
+                            indexTie = i;
                         }
                         if (difference > 0) {
-                            /* The first card we have that is higher, we play it */
-                            return new PlayCardMessage(m.request_id,m.state.hand[i]);
+                            /* The first card we have that is higher, we save the index and break */
+                            minWinIndex = i;
+                            break;
                         } else if (i == currentHand.length - 1) {
-                            /* All our cards are lower or can tie, just play lowest card because the highest of our lowest can still win
-                             * further hands
-                             */
-                            return new PlayCardMessage(m.request_id,m.state.hand[0]);
+                            /* All our cards are lower or can tie */
+                            /* If we can tie */
+                            if (indexTie != -1) {
+                                /* If they have 2 tricks, we tie otherwise they would win */
+                                if (m.state.their_tricks == 2) {
+                                    return new PlayCardMessage(m.request_id, m.state.hand[indexTie]);
+                                } else { //edit later
+                                    return new PlayCardMessage(m.request_id, m.state.hand[0]);
+                                }
+                            } else { /* We can't tie, so play the lowest card */
+                                return new PlayCardMessage(m.request_id,m.state.hand[0]);
+                            }
                         }
                     }
                     
+                    /* If we reach here, that means that we have at least one card that can beat the opponent's card. */
+                    /* We can lose, tie, and win */
+                    if (indexTie != -1) {
+                        
+                    } else { /* We can lose or win */
+                        
+                    }
+                    return new PlayCardMessage(m.request_id,m.state.hand[indexToUse]);
 				}
 			}
 			else if (m.request.equals("challenge_offered")) {
-				return (Math.random() < 0.5)
-						? new AcceptChallengeMessage(m.request_id)
-						: new RejectChallengeMessage(m.request_id);
-			}
+                if(m.state.their_tricks >= 3){ //if they have more tricks than us already
+                    return new RejectChallengeMessage(m.request_id);
+                }
+                else if(m.state.your_tricks >= 3){ //if they are in the lead via points
+                    return new AcceptChallengeMessage(m.request_id);
+                }
+            }
 		}
 		else if (message.type.equals("result")) {
 			ResultMessage r = (ResultMessage)message;
