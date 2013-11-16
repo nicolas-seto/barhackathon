@@ -42,25 +42,31 @@ public class ChallengeHelper {
         }
         switch(ourScore)
         {
+        /* All 5 cards */
         case 0:
+            /* 5 cards in play */
             if(theirScore ==0)
             {
+                /* If no tie or 1 tie */
                 if(arrayLength == 5 || arrayLength == 4)
                 {
                     if((king+queen+jack) >= 3)
                     {
                         result = 2;
                     }
+                /* If 2 ties */
                 } else if(arrayLength == 3)
                 {
                     if((king+queen+jack) >= 2)
                     {
                         result = 2;
                     }
+                /* If 3 ties */
                 } else if (arrayLength == 2) {
                     if ((king + queen + jack) >= 1) {
                         result = 2;
                     }
+                /* If 4 ties */
                 }else if(arrayLength ==1)
                 {
                     if(king+queen ==1)
@@ -68,37 +74,46 @@ public class ChallengeHelper {
                         result = 3;
                     }
                 }
+            /* 4 cards left */
             }else if (theirScore ==1)
             {
+                /* If 1 tie */
                 if(arrayLength ==3)
                 {
-                    if(king+queen ==3)
+                    if(king+queen >= 2)
                     {
                         result = 3;
-                    }else if(king+queen+jack ==3)
+                    }else if(king+queen+jack >=2)
                     {
                         result = 2;
                     }
+                /* If 2 ties */
                 } else if (arrayLength == 2 ){
+                    if (king + queen == 2) {
+                       result = 3;
+                    }
                     if (king + queen + jack == 2) {
                         result = 2;
                     }
+                /* If 3 ties */
                 }else if (arrayLength ==1)
                 {
                     if(king+queen ==1)
                     {
                         result = 3;
                     }
+                /* If 0 ties */
                 }else
                 {
                     if((king+queen+jack) >=3)
                     {
                         result = 2;
-                    }else if ((king+queen+jack) ==2)
+                    }else if ((king+queen+jack) >= 2)
                     {
                         result = 1;
                     }
                 }
+            /* 3 cards left */
             }else if (theirScore == 2)
             {
                 if((king+queen) ==3)
@@ -110,9 +125,9 @@ public class ChallengeHelper {
                 }
             }
             break;
-        case 1: //currently all the if else are similar but we can tweek it later if needed
+        case 1: /* At least 4 cards in hand still */
             if(theirScore ==0) 
-            {
+            {   /* 1 tie */
                 if(arrayLength ==3)
                 {
                     if(king+queen>=2)
@@ -122,6 +137,7 @@ public class ChallengeHelper {
                     {
                         result =2;
                     }
+                /* 2 ties */
                 }else if(arrayLength ==2)
                 {
                     if(king+queen >=1)
@@ -131,6 +147,7 @@ public class ChallengeHelper {
                     {
                         result = 2;
                     }
+                /* 3 ties */
                 }else if (arrayLength ==1)
                 {
                     if(card ==13)
@@ -143,17 +160,18 @@ public class ChallengeHelper {
                     {
                         result =2;
                     }
-                }else{
-                    if((king+queen+jack) ==3 || (king+queen) ==2)
+                }else{ /* 0 ties */
+                    if((king+queen+jack) >=3 || (king+queen) >=2)
                     {
                         result = 2;
-                    }else if(king+queen+jack ==2)
+                    }else if(king+queen+jack >=2)
                     {
                         result = 1;
                     }
                 }
+                /* At least 3 cards left in hands */
             }else if (theirScore ==1)
-            {
+            {   /* There's been 1 tie */
                 if(arrayLength ==2)
                 {
                     if(king+queen>=2)
@@ -166,6 +184,7 @@ public class ChallengeHelper {
                     {
                         result =1;
                     }
+                /* There's been 2 ties */
                 }else if(arrayLength ==1)
                 {
                     if(card ==13)
@@ -179,7 +198,7 @@ public class ChallengeHelper {
                         result =2;
                     }
                 }else
-                    if((king+queen+jack) ==3 || (king+queen) ==2)
+                    if((king+queen+jack) ==3 || (king+queen) >=2)
                     {
                         result = 2;
                     }else if(king+queen+jack ==2)
@@ -238,10 +257,10 @@ public class ChallengeHelper {
                 {
                     result = 3;  
                 }else{
-                    if((queen)>=1 && card !=0)
+                    if((queen)>=1 && card ==0)
                     {
                         result = 2;
-                    }else if(king+queen+jack >=1 && card!=0)
+                    }else if(king+queen+jack >=1 && card==0)
                     {
                         result =1;
                     }}
