@@ -32,7 +32,6 @@ public class ContestBot {
 
 				while (true) {
 					Message message = sock.getMessage();
-		
 					PlayerMessage response = handleMessage(message);
 		
 					if (response != null) {
@@ -54,15 +53,62 @@ public class ContestBot {
 	public PlayerMessage handleMessage(Message message) {
 		if (message.type.equals("request")) {
 			MoveMessage m = (MoveMessage)message;
+			//System.out.println(m.toString());
 			if (game_id != m.state.game_id) {
 				game_id = m.state.game_id;
 				System.out.println("new game " + game_id);
 			}
 
 			if (m.request.equals("request_card")) {
-				if (! m.state.can_challenge || Math.random() < 0.8) {
-					int i = (int)(Math.random() * m.state.hand.length);
-					return new PlayCardMessage(m.request_id, m.state.hand[i]);
+				if (m.state.can_challenge) {
+					//this where we put stuff
+
+					if(m.state.card > 0){
+						System.out.println("Their hand: " + m.state.card);
+						int[] currentHand = m.state.hand;
+						int minimumToWin = 0, highestToLose = 0;
+						int minIndex = 0, highIndex = 0;
+
+						for(int i = 0; i < currentHand.length; i++){
+							int difference = currentHand[i]-m.state.card;
+
+							//this finds the lowest possible card to beat their card
+							if(minimumToWin > difference && difference > 0){
+								minimumToWin = difference;
+								minIndex = i;
+							}
+							//dumps lowest card if we cant beat
+							else if(highestToLose > difference && highestToLose < 0){
+								highestToLose = difference;
+								highIndex = i;
+							}
+							else{	//tie
+
+							}
+						}//end forloop
+
+						int indextoUse = (int)(Math.random() * m.state.hand.length);;
+
+						if(minimumToWin != 0){ //if we can win
+							indextoUse = minIndex;
+							System.out.println("going to win");
+							
+						}
+						else{ //we will lose
+							indextoUse = highIndex;
+							System.out.println("going to lose");
+						}
+
+						return new PlayCardMessage(m.request_id,m.state.hand[indextoUse]);
+
+					}
+					else{
+						int i = (int)(Math.random() * m.state.hand.length);
+						System.out.println("Randomed:" + m.state.hand[i]);
+						return new PlayCardMessage(m.request_id, m.state.hand[i]);
+
+					}
+
 				}
 				else {
 					return new OfferChallengeMessage(m.request_id);
@@ -75,7 +121,8 @@ public class ContestBot {
 			}
 		}
 		else if (message.type.equals("result")) {
-			//ResultMessage r = (ResultMessage)message;
+			ResultMessage r = (ResultMessage)message;
+			System.out.println(r.toString());
 		}
 		else if (message.type.equals("error")) {
 			ErrorMessage e = (ErrorMessage)message;
