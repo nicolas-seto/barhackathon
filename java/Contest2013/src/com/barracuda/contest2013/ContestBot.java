@@ -76,7 +76,6 @@ public class ContestBot {
 			}
 
 			if (m.request.equals("request_card")) {
-			    
 			    int[] currentHand = m.state.hand;
                 Arrays.sort(currentHand);
                 
@@ -85,7 +84,7 @@ public class ContestBot {
 				    if (m.state.your_tricks >= 3) {
 				        return new OfferChallengeMessage(m.request_id);
 				    } else {
-				        return new PlayCardMessage(m.request_id, m.state.hand[currentHand.length - 1]);
+				        return new PlayCardMessage(m.request_id, currentHand[currentHand.length - 1]);
 				    }
 				}
 				else { /* We are second to play and can only play card */
@@ -112,12 +111,12 @@ public class ContestBot {
                             if (indexTie != -1) {
                                 /* If they have 2 tricks, we tie otherwise they would win */
                                 if (m.state.their_tricks == 2) {
-                                    return new PlayCardMessage(m.request_id, m.state.hand[indexTie]);
+                                    return new PlayCardMessage(m.request_id, currentHand[indexTie]);
                                 } else { //edit later
-                                    return new PlayCardMessage(m.request_id, m.state.hand[0]);
+                                    return new PlayCardMessage(m.request_id, currentHand[0]);
                                 }
                             } else { /* We can't tie, so play the lowest card */
-                                return new PlayCardMessage(m.request_id,m.state.hand[0]);
+                                return new PlayCardMessage(m.request_id, currentHand[0]);
                             }
                         }
                     }
@@ -125,9 +124,9 @@ public class ContestBot {
                     /* If we reach here, that means that we have at least one card that can beat the opponent's card. */
                     /* We can lose, tie, and win */
                     if (indexTie != -1) {
-                        return new PlayCardMessage(m.request_id, m.state.hand[minWinIndex]);
+                        return new PlayCardMessage(m.request_id, currentHand[minWinIndex]);
                     } else { /* We can lose or win */
-                        return new PlayCardMessage(m.request_id, m.state.hand[minWinIndex]);
+                        return new PlayCardMessage(m.request_id, currentHand[minWinIndex]);
                     }
 				}
 			} else if (m.request.equals("challenge_offered")) {
