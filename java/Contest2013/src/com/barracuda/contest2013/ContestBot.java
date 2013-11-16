@@ -111,7 +111,7 @@ public class ContestBot {
 
                     System.out.println("Their hand: " + m.state.card);
                     load.decrement(m.state.card);
-
+                    accept = ChallengeHelper.isChallengeAccepted(currentHand, m.state.your_tricks, m.state.their_tricks, m.state.your_points, m.state.their_points, 0);
                     if (m.state.can_challenge) {
                         if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
                             return new OfferChallengeMessage(m.request_id);
