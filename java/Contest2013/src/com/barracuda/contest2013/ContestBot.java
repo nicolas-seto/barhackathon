@@ -89,7 +89,7 @@ public class ContestBot {
     				        return new OfferChallengeMessage(m.request_id);
     				    } else if (currentHand.length % 2 == 1) { /* Pick middle */
     				        return new PlayCardMessage(m.request_id, currentHand[currentHand.length / 2]);
-    				    } else if (currentHand.length % 2 == 0) {
+    				    } else if (currentHand.length % 2 == 0) { /* Card is even, then pick the lower half */
     				        return new PlayCardMessage(m.request_id, currentHand[(currentHand.length / 2) - 1]);
     				    }
 				    } else { /* A challenge has been offered and we're playing */
