@@ -92,7 +92,6 @@ public class ContestBot {
     				    if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
     				        return new OfferChallengeMessage(m.request_id);
     				    }
-    				    
     				    if (currentHand.length % 2 == 1) { /* Pick middle */
     				        return new PlayCardMessage(m.request_id, currentHand[currentHand.length / 2]);
     				    } else if (currentHand.length % 2 == 0) { /* Card is even, then pick the lower half */
@@ -113,6 +112,12 @@ public class ContestBot {
                     System.out.println("Their hand: " + m.state.card);
                     load.decrement(m.state.card);
 
+                    if (m.state.can_challenge) {
+                        if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
+                            return new OfferChallengeMessage(m.request_id);
+                        }
+                    }
+                    
                     for(int i = 0; i < currentHand.length; i++) {
                         int difference = currentHand[i] - m.state.card;
                         
@@ -170,7 +175,7 @@ public class ContestBot {
 			        if (m.state.their_tricks >= 3){ // if they have 3+ tricks already, it's automatic loss in point
 	                    return new RejectChallengeMessage(m.request_id);
 	                } else { // edit later: check our current hand
-	                    if(accept){
+	                    if(accept || load.getHighPercentage() < .45){
 	                        return new AcceptChallengeMessage(m.request_id);
 	                    }
 	                    return new RejectChallengeMessage(m.request_id);
@@ -179,7 +184,11 @@ public class ContestBot {
 			        if (m.state.your_tricks >= 3){ // if we have 3+ tricks already, this is an instant win
 	                    return new AcceptChallengeMessage(m.request_id);
 	                } else { // edit later: check our current hand
-	                    if(accept){
+	                    if (m.state.your_points == 9){
+	                        if (accept || load.getHighPercentage() < .45) {
+	                            return new AcceptChallengeMessage(m.request_id);
+	                        }
+	                    } else if(accept){
 	                        return new AcceptChallengeMessage(m.request_id);
 	                    }
 	                    return new RejectChallengeMessage(m.request_id);

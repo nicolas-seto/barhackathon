@@ -24,6 +24,8 @@ public class RemainingCardStats {
     
     public void reshuffle() {
         cards_remaining = new int[]{8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
+        low = 48;
+        high = 56;
     }
     
     private void calculateHighPercentage() {
