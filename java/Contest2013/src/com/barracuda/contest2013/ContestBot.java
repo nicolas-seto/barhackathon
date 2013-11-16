@@ -185,9 +185,7 @@ public class ContestBot {
 	                    return new RejectChallengeMessage(m.request_id);
 	                }
 			    } else { // we are tied in tricks
-			        if (accept) {
-			            return new RejectChallengeMessage(m.request_id);
-			        } else if (load.getHighPercentage() < .45) {
+			        if (accept || load.getHighPercentage() < .45) {
 			            return new AcceptChallengeMessage(m.request_id);
 			        }
                     return new RejectChallengeMessage(m.request_id);
