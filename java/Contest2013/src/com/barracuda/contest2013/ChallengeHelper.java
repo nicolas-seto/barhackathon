@@ -322,6 +322,16 @@ public class ChallengeHelper {
     {
         boolean result = isChallengeAccepted(sort,ourScore,theirScore,ourPoint,theirPoint,0);
         int size = sort.length;
+        int h=0, t=0, l=0;
+        for (int i = 0; i < size; i++) {
+            if (sort[i] <= 4) {
+                l++;
+            } else if (sort[i] <= 8) {
+                t++;
+            } else {
+                h++;
+            }
+        }
         if(ourScore == theirScore && size ==1 )
         {
             if(card == 13)
@@ -332,7 +342,7 @@ public class ChallengeHelper {
             }
         }       
         
-        if(theirPoint == 9)
+        if(theirPoint == 9 || (h >= 3 && t >= 1) || (h >=2 && t >= 2))
         {
             result = true;
         }

@@ -91,7 +91,7 @@ public class ContestBot {
 				    /* No one has challenged yet and we can challenge */
 				    if (m.state.can_challenge) {
 				        /* If we have 3 tricks or more */
-    				    if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
+    				    if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4 && load.getLowPercentage() > .6 && m.state.total_tricks == 0)) { 
     				        return new OfferChallengeMessage(m.request_id);
     				    }
     				    if (currentHand.length % 2 == 1) { /* Pick middle */
@@ -115,7 +115,7 @@ public class ContestBot {
                     load.decrement(m.state.card);
                     accept = ChallengeHelper.issueChallenge(currentHand, m.state.your_tricks, m.state.their_tricks, m.state.your_points, m.state.their_points, m.state.card);
                     if (m.state.can_challenge) {
-                        if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4 && load.getHighPercentage() > .6 && m.state.total_tricks == 0)) { 
+                        if (m.state.your_tricks >= 3 || accept || (m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4 && load.getLowPercentage() > .55 && m.state.total_tricks == 0)) { 
                             return new OfferChallengeMessage(m.request_id);
                         }
                     }
@@ -167,11 +167,25 @@ public class ContestBot {
 				}
 			} else if (m.request.equals("challenge_offered")) {
 			    
+			    int h=0, t=0, l=0;
+                int size = currentHand.length;
+                for (int i = 0; i < size; i++) {
+                    if (currentHand[i] <= 4) {
+                        l++;
+                    } else if (currentHand[i] <= 8) {
+                        t++;
+                    } else {
+                        h++;
+                    }
+                }
+			    
 			    if (m.state.their_tricks > m.state.your_tricks) { // they have more tricks than us
 			        if (m.state.their_tricks >= 3){ // if they have 3+ tricks already, it's automatic loss in point
 	                    return new RejectChallengeMessage(m.request_id);
 	                } else { // edit later: check our current hand
-	                    if(accept || load.getHighPercentage() < .45){
+	                    if(accept || (load.getHighPercentage() < .4 && m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4)){
+	                        return new AcceptChallengeMessage(m.request_id);
+	                    } else if (h >= 2) {
 	                        return new AcceptChallengeMessage(m.request_id);
 	                    }
 	                    return new RejectChallengeMessage(m.request_id);
@@ -181,7 +195,7 @@ public class ContestBot {
 	                    return new AcceptChallengeMessage(m.request_id);
 	                } else { // edit later: check our current hand
 	                    if (m.state.your_points == 9){
-	                        if (accept || load.getHighPercentage() < .45) {
+	                        if (accept || (load.getHighPercentage() < .4 && m.state.hand_id % 10 > 0 && m.state.hand_id % 10 < 4)) {
 	                            return new AcceptChallengeMessage(m.request_id);
 	                        }
 	                    } else if(accept){
@@ -190,20 +204,7 @@ public class ContestBot {
 	                    return new RejectChallengeMessage(m.request_id);
 	                }
 			    } else { // we are tied in tricks
-			        
-			        int h=0, t=0, l=0;
-			        int size = currentHand.length;
-			        for (int i = 0; i < size; i++) {
-			            if (currentHand[i] <= 5) {
-			                l++;
-			            } else if (currentHand[i] <= 9) {
-			                t++;
-			            } else {
-			                h++;
-			            }
-			        }
-			        
-			        if (accept || load.getHighPercentage() < .5 || (h >= 2 && t >= 1)) {
+			        if (accept || load.getHighPercentage() < .4 || ((h >= 3 && t >= 1 || h >= 2 && t >= 2) && m.state.your_points == 9)) {
 			            return new AcceptChallengeMessage(m.request_id);
 			        }
                     return new RejectChallengeMessage(m.request_id);
