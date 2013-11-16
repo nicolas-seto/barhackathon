@@ -82,12 +82,15 @@ public class ContestBot {
                 
 			    /* We are first to play and can play card or issue challenge*/
 				if (m.state.can_challenge) {
-				    return new PlayCardMessage(m.request_id, m.state.hand[currentHand.length -1]);
+				    if (m.state.your_tricks >= 3) {
+				        return new OfferChallengeMessage(m.request_id);
+				    } else {
+				        return new PlayCardMessage(m.request_id, m.state.hand[currentHand.length - 1]);
+				    }
 				}
 				else { /* We are second to play and can only play card */
 				    int indexTie = -1;
 				    int minWinIndex = -1;
-				    int indexToUse = -1;
 
                     System.out.println("Their hand: " + m.state.card);
                     
@@ -122,27 +125,33 @@ public class ContestBot {
                     /* If we reach here, that means that we have at least one card that can beat the opponent's card. */
                     /* We can lose, tie, and win */
                     if (indexTie != -1) {
-                        
+                        return new PlayCardMessage(m.request_id, m.state.hand[minWinIndex]);
                     } else { /* We can lose or win */
-                        
+                        return new PlayCardMessage(m.request_id, m.state.hand[minWinIndex]);
                     }
-                    return new PlayCardMessage(m.request_id,m.state.hand[indexToUse]);
 				}
-			}
-			else if (m.request.equals("challenge_offered")) {
-                if(m.state.their_tricks >= 3){ //if they have more tricks than us already
+			} else if (m.request.equals("challenge_offered")) {
+			    if (m.state.their_tricks > m.state.your_tricks) { // they have more tricks than us
+			        if (m.state.their_tricks >= 3){ // if they have 3+ tricks already, it's automatic loss in point
+	                    return new RejectChallengeMessage(m.request_id);
+	                } else { // edit later: check our current hand
+	                    return new RejectChallengeMessage(m.request_id);
+	                }
+			    } else if (m.state.their_tricks < m.state.your_tricks) { // we have more tricks than them
+			        if (m.state.your_tricks >= 3){ // if we have 3+ tricks already, this is an instant win
+	                    return new AcceptChallengeMessage(m.request_id);
+	                } else { // edit later: check our current hand
+	                    return new AcceptChallengeMessage(m.request_id);
+	                }
+			    } else { // we are tied in tricks
                     return new RejectChallengeMessage(m.request_id);
-                }
-                else if(m.state.your_tricks >= 3){ //if they are in the lead via points
-                    return new AcceptChallengeMessage(m.request_id);
+                    // edit later: check our current hand
                 }
             }
-		}
-		else if (message.type.equals("result")) {
-			ResultMessage r = (ResultMessage)message;
+		} else if (message.type.equals("result")) {
+			ResultMessage r = (ResultMessage) message;
 			System.out.println(r.toString());
-		}
-		else if (message.type.equals("error")) {
+		} else if (message.type.equals("error")) {
 			ErrorMessage e = (ErrorMessage)message;
 			System.err.println("Error: " + e.message);
 
