@@ -158,6 +158,9 @@ public class ContestBot {
                         return new PlayCardMessage(m.request_id, lowestWin);
                     /* If our next highest winning card is much larger than opponent's card, drop lowest card */
                     } else if (lowestWin - m.state.card >= 4) {
+                        if (currentHand.length == 2) {
+                            return new PlayCardMessage(m.request_id, lowestWin);
+                        }
                         return new PlayCardMessage(m.request_id, currentHand[0]);
                     }
                     return new PlayCardMessage(m.request_id, lowestWin);
@@ -187,7 +190,20 @@ public class ContestBot {
 	                    return new RejectChallengeMessage(m.request_id);
 	                }
 			    } else { // we are tied in tricks
-			        if (accept || load.getHighPercentage() < .45) {
+			        
+			        int h=0, t=0, l=0;
+			        int size = currentHand.length;
+			        for (int i = 0; i < size; i++) {
+			            if (currentHand[i] <= 5) {
+			                l++;
+			            } else if (currentHand[i] <= 9) {
+			                t++;
+			            } else {
+			                h++;
+			            }
+			        }
+			        
+			        if (accept || load.getHighPercentage() < .5 || (h >= 2 && t >= 1)) {
 			            return new AcceptChallengeMessage(m.request_id);
 			        }
                     return new RejectChallengeMessage(m.request_id);

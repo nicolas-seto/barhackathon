@@ -318,7 +318,7 @@ public class ChallengeHelper {
         return result;
     }
     
-    public static boolean issueChallenge (int[] sort,int ourScore,int theirScore,int ourPoint, int theirPoint,int card)
+    public static boolean issueChallenge(int[] sort,int ourScore,int theirScore,int ourPoint, int theirPoint,int card)
     {
         boolean result = isChallengeAccepted(sort,ourScore,theirScore,ourPoint,theirPoint,0);
         int size = sort.length;
